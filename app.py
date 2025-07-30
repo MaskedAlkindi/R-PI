@@ -34,6 +34,9 @@ app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
 # Initialize extensions
 csrf = CSRFProtect(app)
 
+# Disable CSRF for API endpoints
+csrf.exempt(app)
+
 # Initialize managers
 usb_manager = USBManager()
 file_ops = FileOperations()
