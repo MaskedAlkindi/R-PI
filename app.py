@@ -71,6 +71,10 @@ def mount_usb_device(device):
         original_device = device
         device = urllib.parse.unquote(device)
         
+        # Ensure device has leading slash if it's a device path
+        if device.startswith('dev/') and not device.startswith('/dev/'):
+            device = '/' + device
+        
         logger.info(f"Mounting device: original='{original_device}', decoded='{device}'")
         
         mount_point = usb_manager.mount_device(device)
