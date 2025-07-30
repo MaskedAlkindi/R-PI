@@ -41,8 +41,15 @@ class USBManager:
             if result.returncode == 0:
                 data = json.loads(result.stdout)
                 
+                # First, find USB disks
+                usb_disks = set()
                 for device in data.get('blockdevices', []):
-                    if self._is_usb_storage(device):
+                    if device.get('type') == 'disk' and self._is_removable_disk(device):
+                        usb_disks.add(device['name'])
+                
+                # Then find partitions of USB disks
+                for device in data.get('blockdevices', []):
+                    if device.get('type') == 'part' and self._is_usb_partition(device, usb_disks):
                         device_info = {
                             'name': device['name'],
                             'size': device.get('size', 'Unknown'),
@@ -60,27 +67,45 @@ class USBManager:
         
         return devices
     
-    def _is_usb_storage(self, device: Dict) -> bool:
-        """Check if device is USB storage."""
-        # We want to mount partitions, not disks
-        if device.get('type') != 'part':
-            return False
-        
-        # Check if it's a USB partition by looking at the parent disk
+    def _is_removable_disk(self, device: Dict) -> bool:
+        """Check if device is a removable disk."""
         try:
-            device_name = device['name']
-            if device_name.endswith('1'):  # Common partition naming
-                parent_disk = device_name[:-1]  # Remove the partition number
-                parent_path = f"/sys/block/{parent_disk}"
-                if os.path.exists(parent_path):
-                    removable_path = os.path.join(parent_path, 'removable')
-                    if os.path.exists(removable_path):
-                        with open(removable_path, 'r') as f:
-                            return f.read().strip() == '1'
+            device_name = device['name'].replace('/dev/', '')
+            device_path = f"/sys/block/{device_name}"
+            if os.path.exists(device_path):
+                removable_path = os.path.join(device_path, 'removable')
+                if os.path.exists(removable_path):
+                    with open(removable_path, 'r') as f:
+                        return f.read().strip() == '1'
         except:
             pass
-        
         return False
+    
+    def _is_usb_partition(self, device: Dict, usb_disks: set) -> bool:
+        """Check if partition belongs to a USB disk."""
+        try:
+            device_name = device['name']
+            # Extract disk name from partition name (e.g., sda1 -> sda)
+            if '/' in device_name:
+                disk_name = device_name.split('/')[-1]
+            else:
+                disk_name = device_name
+            
+            # Remove partition number to get disk name
+            for i in range(len(disk_name)):
+                if disk_name[i].isdigit():
+                    disk_name = disk_name[:i]
+                    break
+            
+            # Check if this partition belongs to a USB disk
+            return f"/dev/{disk_name}" in usb_disks
+        except:
+            pass
+        return False
+    
+    def _is_usb_storage(self, device: Dict) -> bool:
+        """Legacy method - kept for compatibility."""
+        return self._is_removable_disk(device)
     
     def _get_devices_fallback(self) -> List[Dict]:
         """Fallback method to get USB devices."""
