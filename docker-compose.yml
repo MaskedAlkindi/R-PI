@@ -11,7 +11,7 @@ services:
       - /dev:/dev:ro
       # Mount system directories for USB detection
       - /sys:/sys:ro
-      - /proc:/proc:ro
+      - /proc:/proc
       # Mount media directory for USB mounting
       - /media:/media
       # Mount udev for device detection
@@ -28,6 +28,9 @@ services:
       - /dev:/dev
     cap_add:
       - SYS_ADMIN  # Required for mounting/unmounting
+      - NET_ADMIN  # Required for network operations
+      - SYS_NICE   # Required for process priority
+      - SYS_PTRACE # Required for debugging
     security_opt:
       - seccomp:unconfined  # May be needed for some USB operations
     networks:
