@@ -66,6 +66,13 @@ def get_usb_devices():
 def mount_usb_device(device):
     """Mount a USB device."""
     try:
+        # Decode the device name in case it's URL-encoded
+        import urllib.parse
+        original_device = device
+        device = urllib.parse.unquote(device)
+        
+        logger.info(f"Mounting device: original='{original_device}', decoded='{device}'")
+        
         mount_point = usb_manager.mount_device(device)
         return jsonify({
             'success': True,
