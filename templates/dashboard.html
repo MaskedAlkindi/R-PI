@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Reverse USB Platform{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- USB Device Panel -->
+    <div class="col-lg-3 col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-hdd me-2"></i>USB Devices
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="usb-devices-list">
+                    <div class="text-center text-muted">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p class="mt-2">Loading devices...</p>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <button class="btn btn-outline-primary btn-sm w-100" id="refresh-devices-btn">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh Devices
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- USB Status -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>USB Status
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id="usb-status">
+                    <div class="text-center text-muted">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p class="mt-2">Loading status...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="col-lg-9 col-md-8">
+        <!-- File Browser Header -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0" id="file-breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="#" data-path="" class="breadcrumb-link">
+                                        <i class="fas fa-home"></i> Root
+                                    </a>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="view-grid-btn" title="Grid View">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="view-list-btn" title="List View">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-primary btn-sm ms-2" id="new-folder-btn">
+                            <i class="fas fa-folder-plus me-1"></i>New Folder
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Zone -->
+        <div class="card mb-3" id="upload-zone">
+            <div class="card-body text-center p-4">
+                <div class="upload-area" id="upload-area">
+                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                    <h5>Drag & Drop Files Here</h5>
+                    <p class="text-muted">or click to browse files</p>
+                    <input type="file" id="file-input" multiple style="display: none;">
+                    <button class="btn btn-outline-primary" onclick="document.getElementById('file-input').click()">
+                        <i class="fas fa-folder-open me-1"></i>Browse Files
+                    </button>
+                </div>
+                <div class="upload-progress d-none" id="upload-progress">
+                    <div class="progress mb-2">
+                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small class="text-muted">Uploading...</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Browser -->
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-folder-open me-2"></i>Files
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" id="file-search" placeholder="Search files...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="files-container">
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-folder-open fa-3x mb-3"></i>
+                        <h5>No USB device mounted</h5>
+                        <p>Please mount a USB device to view files</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- File Context Menu -->
+<div class="context-menu" id="context-menu">
+    <ul class="list-unstyled mb-0">
+        <li><a href="#" class="context-menu-item" data-action="open">
+            <i class="fas fa-folder-open me-2"></i>Open
+        </a></li>
+        <li><a href="#" class="context-menu-item" data-action="download">
+            <i class="fas fa-download me-2"></i>Download
+        </a></li>
+        <li><a href="#" class="context-menu-item" data-action="rename">
+            <i class="fas fa-edit me-2"></i>Rename
+        </a></li>
+        <li><a href="#" class="context-menu-item" data-action="delete">
+            <i class="fas fa-trash me-2"></i>Delete
+        </a></li>
+    </ul>
+</div>
+
+<!-- File Template (Hidden) -->
+<template id="file-template">
+    <div class="file-item" data-file-path="" data-file-name="">
+        <div class="file-icon">
+            <i class="fas fa-file"></i>
+        </div>
+        <div class="file-info">
+            <div class="file-name"></div>
+            <div class="file-meta">
+                <span class="file-size"></span>
+                <span class="file-date"></span>
+            </div>
+        </div>
+        <div class="file-actions">
+            <button class="btn btn-sm btn-outline-secondary file-action-btn" title="Download">
+                <i class="fas fa-download"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary file-action-btn" title="Rename">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger file-action-btn" title="Delete">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<!-- Folder Template (Hidden) -->
+<template id="folder-template">
+    <div class="folder-item" data-folder-path="" data-folder-name="">
+        <div class="folder-icon">
+            <i class="fas fa-folder"></i>
+        </div>
+        <div class="folder-info">
+            <div class="folder-name"></div>
+            <div class="folder-meta">
+                <span class="folder-count"></span>
+            </div>
+        </div>
+        <div class="folder-actions">
+            <button class="btn btn-sm btn-outline-secondary folder-action-btn" title="Rename">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger folder-action-btn" title="Delete">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+</template>
+{% endblock %} 

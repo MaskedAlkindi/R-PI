@@ -1,0 +1,445 @@
+/* Reverse USB Platform Styles */
+
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --body-bg: #ffffff;
+    --card-bg: #ffffff;
+    --text-color: #212529;
+    --border-color: #dee2e6;
+    --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Dark Mode Variables */
+[data-theme="dark"] {
+    --body-bg: #1a1a1a;
+    --card-bg: #2d2d2d;
+    --text-color: #e9ecef;
+    --border-color: #495057;
+    --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
+}
+
+body {
+    background-color: var(--body-bg);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* USB Device Panel */
+.usb-device {
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background-color: var(--card-bg);
+    transition: all 0.2s ease;
+}
+
+.usb-device:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 123, 255, 0.25);
+}
+
+.usb-device.mounted {
+    border-color: var(--success-color);
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+.usb-device-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.usb-device-icon {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+}
+
+.usb-device-details h6 {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.usb-device-details small {
+    color: var(--secondary-color);
+    font-size: 0.75rem;
+}
+
+/* File Browser */
+.files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+.files-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.file-item, .folder-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    background-color: var(--card-bg);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.file-item:hover, .folder-item:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.file-icon, .folder-icon {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+    width: 2rem;
+    text-align: center;
+}
+
+.file-icon i {
+    color: var(--secondary-color);
+}
+
+.folder-icon i {
+    color: var(--warning-color);
+}
+
+.file-info, .folder-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-name, .folder-name {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-meta, .folder-meta {
+    font-size: 0.75rem;
+    color: var(--secondary-color);
+}
+
+.file-actions, .folder-actions {
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.file-item:hover .file-actions,
+.folder-item:hover .folder-actions {
+    opacity: 1;
+}
+
+/* Upload Zone */
+.upload-area {
+    border: 2px dashed var(--border-color);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upload-area:hover,
+.upload-area.dragover {
+    border-color: var(--primary-color);
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.upload-area.dragover {
+    transform: scale(1.02);
+}
+
+.upload-progress {
+    padding: 1rem;
+}
+
+.progress {
+    height: 0.5rem;
+    border-radius: 0.25rem;
+}
+
+/* Context Menu */
+.context-menu {
+    position: fixed;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 150px;
+    display: none;
+}
+
+.context-menu ul {
+    margin: 0;
+    padding: 0.5rem 0;
+}
+
+.context-menu-item {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.context-menu-item:hover {
+    background-color: var(--light-color);
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    background: none;
+    padding: 0;
+    margin: 0;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: var(--secondary-color);
+}
+
+.breadcrumb-link {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+/* Status Indicators */
+.status-indicator {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.status-indicator.connected {
+    background-color: var(--success-color);
+}
+
+.status-indicator.disconnected {
+    background-color: var(--danger-color);
+}
+
+.status-indicator.unknown {
+    background-color: var(--warning-color);
+}
+
+/* Space Usage Bar */
+.space-usage {
+    margin: 1rem 0;
+}
+
+.space-bar {
+    height: 0.5rem;
+    border-radius: 0.25rem;
+    background-color: var(--light-color);
+    overflow: hidden;
+}
+
+.space-used {
+    height: 100%;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.space-used.warning {
+    background-color: var(--warning-color);
+}
+
+.space-used.danger {
+    background-color: var(--danger-color);
+}
+
+/* File Type Icons */
+.file-icon .fa-file-pdf { color: #dc3545; }
+.file-icon .fa-file-word { color: #007bff; }
+.file-icon .fa-file-excel { color: #28a745; }
+.file-icon .fa-file-powerpoint { color: #fd7e14; }
+.file-icon .fa-file-image { color: #6f42c1; }
+.file-icon .fa-file-video { color: #e83e8c; }
+.file-icon .fa-file-audio { color: #20c997; }
+.file-icon .fa-file-archive { color: #6c757d; }
+.file-icon .fa-file-code { color: #17a2b8; }
+.file-icon .fa-file-text { color: #495057; }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .files-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .file-item, .folder-item {
+        padding: 0.5rem;
+    }
+    
+    .file-actions, .folder-actions {
+        opacity: 1;
+    }
+    
+    .upload-area {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .files-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .file-item, .folder-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .file-icon, .folder-icon {
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+    
+    .file-actions, .folder-actions {
+        margin-top: 0.5rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.file-item, .folder-item {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Toast Notifications */
+.toast {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.toast-header {
+    background-color: var(--card-bg);
+    border-bottom-color: var(--border-color);
+}
+
+/* Modal Customization */
+.modal-content {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.modal-header {
+    border-bottom-color: var(--border-color);
+}
+
+.modal-footer {
+    border-top-color: var(--border-color);
+}
+
+/* Form Controls */
+.form-control {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.form-control:focus {
+    background-color: var(--card-bg);
+    border-color: var(--primary-color);
+    color: var(--text-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Button Hover Effects */
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+/* Selection Styles */
+.file-item.selected,
+.folder-item.selected {
+    border-color: var(--primary-color);
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+/* Drag and Drop Visual Feedback */
+.dragover {
+    border-color: var(--primary-color) !important;
+    background-color: rgba(0, 123, 255, 0.1) !important;
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1rem;
+    height: 1rem;
+    margin: -0.5rem 0 0 -0.5rem;
+    border: 2px solid var(--primary-color);
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+} 

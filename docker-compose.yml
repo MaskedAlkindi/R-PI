@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  reverse-usb-platform:
+    build: .
+    container_name: reverse-usb-platform
+    ports:
+      - "55005:55005"
+    volumes:
+      # Mount USB devices
+      - /dev:/dev:ro
+      # Mount system directories for USB detection
+      - /sys:/sys:ro
+      - /proc:/proc:ro
+      # Mount media directory for USB mounting
+      - /media:/media
+      # Mount udev for device detection
+      - /run/udev:/run/udev:ro
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - FLASK_ENV=production
+    restart: unless-stopped
+    privileged: true  # Required for USB device access
+    devices:
+      # Allow access to all block devices
+      - /dev:/dev
+    cap_add:
+      - SYS_ADMIN  # Required for mounting/unmounting
+    security_opt:
+      - seccomp:unconfined  # May be needed for some USB operations
+    networks:
+      - usb-network
+
+networks:
+  usb-network:
+    driver: bridge 
