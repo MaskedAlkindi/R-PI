@@ -19,6 +19,8 @@ services:
     environment:
       - SECRET_KEY=your-secret-key-change-in-production
       - FLASK_ENV=production
+      - PORT=55005
+      - HOST=0.0.0.0
     restart: unless-stopped
     privileged: true  # Required for USB device access
     devices:
@@ -26,10 +28,8 @@ services:
       - /dev:/dev
     cap_add:
       - SYS_ADMIN  # Required for mounting/unmounting
-      - NET_ADMIN  # Required for network operations
     security_opt:
       - seccomp:unconfined  # May be needed for some USB operations
-      - apparmor:unconfined  # Allow network modifications
     networks:
       - usb-network
 

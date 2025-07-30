@@ -46,15 +46,8 @@ RUN mkdir -p /media/usb && \
     chmod 755 /media/usb && \
     chown app:app /media/usb
 
-# Switch to app user
-USER app
-
 # Expose port
 EXPOSE 55005
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:55005/ || exit 1
-
-# Run the application
+# Run the application as root (temporarily for debugging)
 CMD ["python", "app.py"] 
