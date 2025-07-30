@@ -32,9 +32,9 @@ class USBManager:
         devices = []
         
         try:
-            # Use lsblk to get block devices
+            # Use lsblk to get block devices with more details
             result = subprocess.run(
-                ['lsblk', '-J', '-o', 'NAME,SIZE,TYPE,MOUNTPOINT,LABEL'],
+                ['lsblk', '-J', '-o', 'NAME,SIZE,TYPE,MOUNTPOINT,LABEL,FSTYPE'],
                 capture_output=True, text=True, timeout=10
             )
             
@@ -48,7 +48,8 @@ class USBManager:
                             'size': device.get('size', 'Unknown'),
                             'label': device.get('label', 'No Label'),
                             'mountpoint': device.get('mountpoint', ''),
-                            'type': device.get('type', '')
+                            'type': device.get('type', ''),
+                            'fstype': device.get('fstype', '')
                         }
                         devices.append(device_info)
             
@@ -61,18 +62,21 @@ class USBManager:
     
     def _is_usb_storage(self, device: Dict) -> bool:
         """Check if device is USB storage."""
-        # Check if it's a disk or partition
-        if device.get('type') not in ['disk', 'part']:
+        # We want to mount partitions, not disks
+        if device.get('type') != 'part':
             return False
         
-        # Check if it's removable (USB)
+        # Check if it's a USB partition by looking at the parent disk
         try:
-            device_path = f"/sys/block/{device['name'].replace('/dev/', '')}"
-            if os.path.exists(device_path):
-                removable_path = os.path.join(device_path, 'removable')
-                if os.path.exists(removable_path):
-                    with open(removable_path, 'r') as f:
-                        return f.read().strip() == '1'
+            device_name = device['name']
+            if device_name.endswith('1'):  # Common partition naming
+                parent_disk = device_name[:-1]  # Remove the partition number
+                parent_path = f"/sys/block/{parent_disk}"
+                if os.path.exists(parent_path):
+                    removable_path = os.path.join(parent_path, 'removable')
+                    if os.path.exists(removable_path):
+                        with open(removable_path, 'r') as f:
+                            return f.read().strip() == '1'
         except:
             pass
         
@@ -113,6 +117,10 @@ class USBManager:
     def mount_device(self, device_name: str) -> str:
         """Mount a USB device."""
         try:
+            # Check if device exists
+            if not os.path.exists(device_name):
+                raise Exception(f"Device {device_name} does not exist")
+            
             # Unmount any previously mounted device
             if self.mount_point:
                 self.unmount_device()
@@ -121,14 +129,21 @@ class USBManager:
             mount_point = os.path.join(self.mount_base, f"usb_{os.getpid()}")
             os.makedirs(mount_point, exist_ok=True)
             
-            # Mount the device
+            # Try to mount the device
             result = subprocess.run(
                 ['sudo', 'mount', device_name, mount_point],
                 capture_output=True, text=True, timeout=30
             )
             
             if result.returncode != 0:
-                raise Exception(f"Failed to mount device: {result.stderr}")
+                # Try mounting with auto filesystem detection
+                result = subprocess.run(
+                    ['sudo', 'mount', '-t', 'auto', device_name, mount_point],
+                    capture_output=True, text=True, timeout=30
+                )
+                
+                if result.returncode != 0:
+                    raise Exception(f"Failed to mount device: {result.stderr}")
             
             # Verify mount was successful
             if not os.path.ismount(mount_point):
