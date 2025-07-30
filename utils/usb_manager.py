@@ -59,7 +59,7 @@ class USBManager:
                 for device in all_devices:
                     if device.get('type') == 'part' and self._is_usb_partition(device, usb_disks):
                         device_info = {
-                            'name': device['name'],
+                            'name': f"/dev/{device['name']}",  # Add /dev/ prefix
                             'size': device.get('size', 'Unknown'),
                             'label': device.get('label', 'No Label'),
                             'mountpoint': device.get('mountpoint', ''),
