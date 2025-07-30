@@ -26,8 +26,10 @@ services:
       - /dev:/dev
     cap_add:
       - SYS_ADMIN  # Required for mounting/unmounting
+      - NET_ADMIN  # Required for network operations
     security_opt:
       - seccomp:unconfined  # May be needed for some USB operations
+      - apparmor:unconfined  # Allow network modifications
     networks:
       - usb-network
 
