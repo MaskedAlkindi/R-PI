@@ -196,7 +196,7 @@ class USBPlatform {
     async mountDevice(deviceName) {
         try {
             this.showLoading();
-            const response = await fetch(`/api/usb/mount/${deviceName}`);
+            const response = await fetch(`/api/usb/mount/${encodeURIComponent(deviceName)}`);
             const data = await response.json();
             
             if (data.success) {
