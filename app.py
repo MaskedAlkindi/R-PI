@@ -62,7 +62,7 @@ def get_usb_devices():
             'error': str(e)
         }), 500
 
-@app.route('/api/usb/mount/<device>')
+@app.route('/api/usb/mount/<path:device>')
 def mount_usb_device(device):
     """Mount a USB device."""
     try:
