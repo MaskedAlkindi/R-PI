@@ -41,14 +41,22 @@ class USBManager:
             if result.returncode == 0:
                 data = json.loads(result.stdout)
                 
+                # Process all devices (including nested children)
+                all_devices = []
+                for device in data.get('blockdevices', []):
+                    all_devices.append(device)
+                    # Add children devices
+                    if 'children' in device:
+                        all_devices.extend(device['children'])
+                
                 # First, find USB disks
                 usb_disks = set()
-                for device in data.get('blockdevices', []):
+                for device in all_devices:
                     if device.get('type') == 'disk' and self._is_removable_disk(device):
                         usb_disks.add(device['name'])
                 
                 # Then find partitions of USB disks
-                for device in data.get('blockdevices', []):
+                for device in all_devices:
                     if device.get('type') == 'part' and self._is_usb_partition(device, usb_disks):
                         device_info = {
                             'name': device['name'],
