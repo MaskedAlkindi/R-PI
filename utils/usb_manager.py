@@ -106,7 +106,8 @@ class USBManager:
                     break
             
             # Check if this partition belongs to a USB disk
-            return f"/dev/{disk_name}" in usb_disks
+            # usb_disks contains names like 'sda', not '/dev/sda'
+            return disk_name in usb_disks
         except:
             pass
         return False
