@@ -25,12 +25,12 @@ class FileOperations:
         """Initialize FileOperations with optional USB manager instance."""
         self.usb_manager = usb_manager
         self.allowed_extensions = {
-            'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx',
-            'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'rar', 'mp3', 'mp4',
-            'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv', 'csv', 'json',
-            'xml', 'html', 'css', 'js', 'py', 'java', 'cpp', 'c',
-            'h', 'hpp', 'md', 'log', 'ini', 'cfg', 'conf', 'yml',
-            'yaml', 'toml', 'sql', 'db', 'sqlite', 'bak', 'tmp'
+            '.txt', '.pdf', '.png', '.jpg', '.jpeg', '.gif', '.doc', '.docx',
+            '.xls', '.xlsx', '.ppt', '.pptx', '.zip', '.rar', '.mp3', '.mp4',
+            '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv', '.csv', '.json',
+            '.xml', '.html', '.css', '.js', '.py', '.java', '.cpp', '.c',
+            '.h', '.hpp', '.md', '.log', '.ini', '.cfg', '.conf', '.yml',
+            '.yaml', '.toml', '.sql', '.db', '.sqlite', '.bak', '.tmp'
         }
         self.max_file_size = 100 * 1024 * 1024  # 100MB
         
