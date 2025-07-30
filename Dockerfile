@@ -8,9 +8,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     sudo \
-    lsblk \
+    util-linux \
     mount \
-    umount \
     udev \
     usbutils \
     libmagic1 \
