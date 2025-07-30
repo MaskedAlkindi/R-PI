@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
     udev \
     usbutils \
     libmagic1 \
+    gcc \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Create app user
