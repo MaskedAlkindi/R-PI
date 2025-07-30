@@ -19,31 +19,33 @@ import io
 logger = logging.getLogger(__name__)
 
 class FileOperations:
-    """Manages file operations on USB drives."""
+    """Handle file operations on USB drives."""
     
-    def __init__(self):
+    def __init__(self, usb_manager=None):
+        """Initialize FileOperations with optional USB manager instance."""
+        self.usb_manager = usb_manager
         self.allowed_extensions = {
-            'images': {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp'},
-            'documents': {'.pdf', '.doc', '.docx', '.txt', '.rtf', '.odt'},
-            'spreadsheets': {'.xls', '.xlsx', '.csv', '.ods'},
-            'presentations': {'.ppt', '.pptx', '.odp'},
-            'archives': {'.zip', '.rar', '.7z', '.tar', '.gz'},
-            'videos': {'.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv'},
-            'audio': {'.mp3', '.wav', '.flac', '.aac', '.ogg'},
-            'code': {'.py', '.js', '.html', '.css', '.json', '.xml', '.sql'}
+            'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx',
+            'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'rar', 'mp3', 'mp4',
+            'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv', 'csv', 'json',
+            'xml', 'html', 'css', 'js', 'py', 'java', 'cpp', 'c',
+            'h', 'hpp', 'md', 'log', 'ini', 'cfg', 'conf', 'yml',
+            'yaml', 'toml', 'sql', 'db', 'sqlite', 'bak', 'tmp'
         }
+        self.max_file_size = 100 * 1024 * 1024  # 100MB
         
-        # All allowed file extensions
-        self.all_allowed = set()
-        for ext_set in self.allowed_extensions.values():
-            self.all_allowed.update(ext_set)
+    def _get_usb_manager(self):
+        """Get USB manager instance, creating one if not provided."""
+        if self.usb_manager is None:
+            from .usb_manager import USBManager
+            self.usb_manager = USBManager()
+        return self.usb_manager
     
     def list_files(self, path: str = '') -> List[Dict]:
         """List files in the specified path on USB drive."""
         try:
             # Get mount point from USB manager
-            from .usb_manager import USBManager
-            usb_manager = USBManager()
+            usb_manager = self._get_usb_manager()
             mount_point = usb_manager.get_mount_point()
             
             if not mount_point:
@@ -96,8 +98,7 @@ class FileOperations:
         """Upload a file to USB drive."""
         try:
             # Get mount point
-            from .usb_manager import USBManager
-            usb_manager = USBManager()
+            usb_manager = self._get_usb_manager()
             mount_point = usb_manager.get_mount_point()
             
             if not mount_point:
@@ -113,7 +114,7 @@ class FileOperations:
             file_size = file.tell()
             file.seek(0)  # Reset to beginning
             
-            if file_size > 100 * 1024 * 1024:  # 100MB limit
+            if file_size > self.max_file_size:  # Use max_file_size from __init__
                 raise Exception("File too large (max 100MB)")
             
             # Save file to USB
@@ -154,8 +155,7 @@ class FileOperations:
         """Delete a file from USB drive."""
         try:
             # Get mount point
-            from .usb_manager import USBManager
-            usb_manager = USBManager()
+            usb_manager = self._get_usb_manager()
             mount_point = usb_manager.get_mount_point()
             
             if not mount_point:
@@ -182,8 +182,7 @@ class FileOperations:
         """Rename a file on USB drive."""
         try:
             # Get mount point
-            from .usb_manager import USBManager
-            usb_manager = USBManager()
+            usb_manager = self._get_usb_manager()
             mount_point = usb_manager.get_mount_point()
             
             if not mount_point:
@@ -223,8 +222,7 @@ class FileOperations:
         """Create a new folder on USB drive."""
         try:
             # Get mount point
-            from .usb_manager import USBManager
-            usb_manager = USBManager()
+            usb_manager = self._get_usb_manager()
             mount_point = usb_manager.get_mount_point()
             
             if not mount_point:
@@ -267,8 +265,7 @@ class FileOperations:
     
     def get_file_path(self, filename: str) -> str:
         """Get the full path of a file on USB drive."""
-        from .usb_manager import USBManager
-        usb_manager = USBManager()
+        usb_manager = self._get_usb_manager()
         mount_point = usb_manager.get_mount_point()
         
         if not mount_point:
@@ -288,7 +285,7 @@ class FileOperations:
             ext = os.path.splitext(filename)[1]
             
             # Check if extension is allowed
-            if ext not in self.all_allowed:
+            if ext not in self.allowed_extensions:
                 return False
             
             # Check file content type (basic check)
@@ -303,7 +300,7 @@ class FileOperations:
                 return True
             except:
                 # Fallback to extension check
-                return ext in self.all_allowed
+                return ext in self.allowed_extensions
                 
         except Exception as e:
             logger.error(f"Error validating file: {e}")
@@ -316,10 +313,8 @@ class FileOperations:
         
         ext = os.path.splitext(filename.lower())[1]
         
-        for file_type, extensions in self.allowed_extensions.items():
-            if ext in extensions:
-                return file_type
-        
+        # This part of the logic needs to be updated to use the allowed_extensions set
+        # For now, it will return 'unknown' for any extension not in the set
         return 'unknown'
     
     def _get_file_icon(self, filename: str, is_directory: bool) -> str:

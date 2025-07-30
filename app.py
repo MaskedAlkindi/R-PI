@@ -39,7 +39,7 @@ app.config['WTF_CSRF_ENABLED'] = False
 
 # Initialize managers
 usb_manager = USBManager()
-file_ops = FileOperations()
+file_ops = FileOperations(usb_manager)
 
 # Ensure upload directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
